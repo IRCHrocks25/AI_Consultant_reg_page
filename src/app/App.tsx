@@ -10,6 +10,7 @@ import { MessageFromFounders } from "./components/MessageFromFounders";
 import { FAQSection } from "./components/FAQSection";
 import { TwoChoices } from "./components/TwoChoices";
 import { FinalCTA } from "./components/FinalCTA";
+import { BottomNewToAISection } from "./components/BottomNewToAISection";
 
 export default function App() {
   return (
@@ -45,6 +46,7 @@ export default function App() {
       {/* 10. FINAL CLOSE */}
       <TwoChoices />
       <FinalCTA />
+      <BottomNewToAISection />
 
       {/* Footer */}
       <footer

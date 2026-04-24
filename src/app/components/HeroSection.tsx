@@ -185,6 +185,18 @@ export function HeroSection() {
               />
             </div>
 
+            <button
+              className="cta-btn px-12 py-4 block mx-auto mt-5"
+              onClick={() => {
+                window.dispatchEvent(new Event("open-registration-modal"));
+              }}
+              style={{
+                fontSize: "0.92rem",
+              }}
+            >
+              SAVE MY FREE SEAT →
+            </button>
+
             {/* Body paragraph — moved under video */}
             <p
               className="mt-5 text-center"
