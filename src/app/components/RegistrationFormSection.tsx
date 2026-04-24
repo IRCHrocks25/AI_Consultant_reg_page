@@ -6,7 +6,9 @@ const OPEN_REGISTRATION_MODAL_EVENT = "open-registration-modal";
 
 export function RegistrationFormModal() {
   const [isOpen, setIsOpen] = useState(false);
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const hasOpenedOnceRef = useRef(false);
+  const targetDate = new Date("2026-04-30T09:00:00-07:00");
 
   useEffect(() => {
     const openModal = () => {
@@ -60,6 +62,32 @@ export function RegistrationFormModal() {
     };
   }, []);
 
+  useEffect(() => {
+    const update = () => {
+      const now = new Date();
+      const diff = targetDate.getTime() - now.getTime();
+      if (diff <= 0) {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+
+      setTimeLeft({
+        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((diff / 1000 / 60) % 60),
+        seconds: Math.floor((diff / 1000) % 60),
+      });
+    };
+
+    update();
+    const timer = window.setInterval(update, 1000);
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, [targetDate]);
+
+  const pad = (n: number) => String(n).padStart(2, "0");
+
   if (!isOpen) {
     return null;
   }
@@ -82,7 +110,7 @@ export function RegistrationFormModal() {
       }}
     >
       <div
-        className="w-full max-w-5xl relative"
+        className="w-full max-w-3xl relative"
         onClick={(event) => event.stopPropagation()}
       >
         <button
@@ -127,6 +155,65 @@ export function RegistrationFormModal() {
             }}
           >
             FREE 1-DAY VIRTUAL SUMMIT · AI AGENTS SUMMIT | APRIL 30, 2026 | REGISTER NOW - SEATS ARE LIMITED
+          </div>
+          <div
+            style={{
+              padding: "16px 12px 16px",
+              textAlign: "center",
+              borderBottom: "1px solid rgba(214,51,132,0.2)",
+              background: "rgba(4, 13, 34, 0.35)",
+            }}
+          >
+            <p
+              style={{
+                fontSize: "0.74rem",
+                letterSpacing: "0.16em",
+                color: "rgba(255,255,255,0.62)",
+                textTransform: "uppercase",
+                fontWeight: 700,
+                marginBottom: "12px",
+              }}
+            >
+              Summit starts in
+            </p>
+            <div className="flex items-center justify-center gap-3.5">
+              {[
+                { label: "Days", value: pad(timeLeft.days) },
+                { label: "Hours", value: pad(timeLeft.hours) },
+                { label: "Mins", value: pad(timeLeft.minutes) },
+                { label: "Secs", value: pad(timeLeft.seconds) },
+              ].map(({ label, value }) => (
+                <div key={label} className="flex flex-col items-center">
+                  <div
+                    style={{
+                      minWidth: "56px",
+                      padding: "9px 10px",
+                      borderRadius: "10px",
+                      background: "rgba(255,255,255,0.1)",
+                      border: "1.5px solid rgba(214,51,132,0.4)",
+                      boxShadow: "0 10px 22px rgba(214,51,132,0.22)",
+                      color: "white",
+                      fontWeight: 800,
+                      fontSize: "1.15rem",
+                      lineHeight: 1.1,
+                    }}
+                  >
+                    {value}
+                  </div>
+                  <span
+                    style={{
+                      color: "rgba(255,255,255,0.58)",
+                      fontSize: "0.58rem",
+                      letterSpacing: "0.12em",
+                      marginTop: "5px",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {label}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
           <iframe
             src="https://l.industryrockstars.ch/widget/form/s58n5QGA5Lag7Rpy8Htu"
