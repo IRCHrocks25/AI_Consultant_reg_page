@@ -41,6 +41,61 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
+/* ── CTA Button: shake + glow + shimmer ── */
+@keyframes ctaShake {
+  0%, 52%, 100% { transform: translateX(0) scale(1); }
+  55%           { transform: translateX(-5px) rotate(-0.8deg) scale(1.02); }
+  58%           { transform: translateX(5px)  rotate( 0.8deg) scale(1.02); }
+  61%           { transform: translateX(-4px) rotate(-0.5deg) scale(1.01); }
+  64%           { transform: translateX(4px)  rotate( 0.5deg) scale(1.01); }
+  67%           { transform: translateX(-2px) scale(1.01); }
+  70%           { transform: translateX(2px)  scale(1); }
+  73%           { transform: translateX(0); }
+}
+@keyframes ctaGlow {
+  0%, 100% { box-shadow: 0 10px 35px rgba(214,51,132,0.45), 0 0 0 0 rgba(214,51,132,0); }
+  50%       { box-shadow: 0 16px 55px rgba(214,51,132,0.75), 0 0 28px rgba(242,114,182,0.45); }
+}
+@keyframes ctaShimmer {
+  0%   { left: -110%; }
+  35%  { left: 160%; }
+  100% { left: 160%; }
+}
+
+.cta-btn {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #D63384 0%, #F272B6 100%) !important;
+  color: #fff !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.07em !important;
+  border: none;
+  cursor: pointer;
+  border-radius: 14px !important;
+  animation: ctaShake 4s ease-in-out infinite, ctaGlow 2.2s ease-in-out infinite;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.cta-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -110%;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+  animation: ctaShimmer 4s ease-in-out infinite;
+  pointer-events: none;
+}
+.cta-btn:hover {
+  animation: none;
+  transform: scale(1.05) !important;
+  box-shadow: 0 20px 60px rgba(214,51,132,0.65), 0 0 40px rgba(242,114,182,0.4) !important;
+}
+.cta-btn:active {
+  transform: scale(0.97) !important;
+}
+
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
