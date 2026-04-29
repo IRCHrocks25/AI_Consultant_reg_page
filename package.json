@@ -6,7 +6,8 @@
   "scripts": {
     "build": "node node_modules/vite/bin/vite.js build",
     "dev": "vite",
-    "start": "node server.js"
+    "start": "node server.js",
+    "deploy": "npx wrangler pages deploy build"
   },
   "engines": {
     "node": ">=20"
