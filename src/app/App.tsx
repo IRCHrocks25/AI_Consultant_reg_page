@@ -76,6 +76,8 @@ const GOLD_DARK = "#a8861e";
 
 const FONT_DISPLAY = "'Bebas Neue', sans-serif";
 const FONT_BODY = "'Inter', sans-serif";
+const FORM_SCRIPT_SRC =
+  "https://l.industryrockstars.ch/js/form_embed.js";
 
 const SLIDES = [
   slide1,
@@ -88,7 +90,7 @@ const SLIDES = [
   slide8,
   slide9,
 ];
-const WEBINAR_DATE = new Date("2026-06-15T19:00:00Z");
+const WEBINAR_DATE = new Date("2026-05-07T19:00:00Z");
 
 /* ─── RESPONSIVE HOOK ─────────────────────────────────────────── */
 function useWindowWidth() {
@@ -222,7 +224,7 @@ const GLOBAL_CSS = `
 /* ─── ALERT STRIP ────────────────────────────────────────────── */
 function AlertStrip({ isMobile }: { isMobile: boolean }) {
   const sentence =
-    "⚡ LIMITED SEATS AVAILABLE  ·  FREE VIRTUAL WEBINAR  ·  JUNE 15 · 7PM EST  ·  REGISTER NOW — 100% FREE · NO CREDIT CARD NEEDED";
+    "⚡ LIMITED SEATS AVAILABLE  ·  FREE VIRTUAL WEBINAR  ·  MAY 7 · 7PM EST  ·  REGISTER NOW — 100% FREE · NO CREDIT CARD NEEDED";
   const repeated = Array(6).fill(sentence).join("     ✦     ");
 
   return (
@@ -518,6 +520,143 @@ function CountdownTimer({
   );
 }
 
+function FormCountdown({ isMobile }: { isMobile: boolean }) {
+  const calc = () => {
+    const diff = WEBINAR_DATE.getTime() - Date.now();
+    if (diff <= 0) return { d: 0, h: 0, m: 0, s: 0 };
+    return {
+      d: Math.floor(diff / 86400000),
+      h: Math.floor((diff % 86400000) / 3600000),
+      m: Math.floor((diff % 3600000) / 60000),
+      s: Math.floor((diff % 60000) / 1000),
+    };
+  };
+
+  const [time, setTime] = useState(calc);
+  useEffect(() => {
+    const id = setInterval(() => setTime(calc()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const units = [
+    { val: time.d, label: "DAYS" },
+    { val: time.h, label: "HRS" },
+    { val: time.m, label: "MINS" },
+    { val: time.s, label: "SECS" },
+  ];
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px",
+        marginBottom: "12px",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "8px",
+          fontFamily: FONT_DISPLAY,
+          fontSize: isMobile ? "0.7rem" : "0.78rem",
+          letterSpacing: "0.18em",
+          color: PURPLE_LT,
+        }}
+      >
+        <div
+          style={{
+            width: "14px",
+            height: "1px",
+            background: PURPLE_LT,
+          }}
+        />
+        WEBINAR STARTS IN
+        <div
+          style={{
+            width: "14px",
+            height: "1px",
+            background: PURPLE_LT,
+          }}
+        />
+      </div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-end",
+          justifyContent: "center",
+          gap: "4px",
+          flexWrap: "wrap",
+        }}
+      >
+        {units.map(({ val, label }, i) => (
+          <div
+            key={label}
+            style={{
+              display: "flex",
+              alignItems: "flex-end",
+              gap: "4px",
+            }}
+          >
+            <div
+              style={{
+                background: "rgba(124,58,237,0.12)",
+                border: `1px solid rgba(124,58,237,0.32)`,
+                borderTop: `2px solid ${PURPLE}`,
+                borderRadius: "6px",
+                padding: isMobile ? "8px 9px" : "8px 11px",
+                textAlign: "center",
+                minWidth: isMobile ? "48px" : "56px",
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: FONT_DISPLAY,
+                  fontWeight: 900,
+                  fontSize: isMobile ? "1.2rem" : "1.4rem",
+                  lineHeight: 1,
+                  color: WHITE,
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                {pad(val)}
+              </div>
+              <div
+                style={{
+                  fontFamily: FONT_DISPLAY,
+                  fontSize: "0.48rem",
+                  letterSpacing: "0.13em",
+                  color: PURPLE_LT,
+                  marginTop: "4px",
+                }}
+              >
+                {label}
+              </div>
+            </div>
+            {i < 3 && (
+              <span
+                style={{
+                  fontFamily: FONT_DISPLAY,
+                  fontWeight: 900,
+                  fontSize: "1rem",
+                  color: "rgba(124,58,237,0.6)",
+                  lineHeight: 1,
+                  paddingBottom: "10px",
+                }}
+              >
+                :
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ─── TESTIMONIAL IMAGE SLIDER ─────────────────────────────────── */
 function TestimonialSlider({
   isMobile,
@@ -790,13 +929,17 @@ function CTABtn({
   label = "RESERVE MY SEAT NOW",
   small = false,
   full = false,
+  onClick,
 }: {
   label?: string;
   small?: boolean;
   full?: boolean;
+  onClick: () => void;
 }) {
   return (
     <button
+      type="button"
+      onClick={onClick}
       style={{
         fontFamily: FONT_DISPLAY,
         background: `linear-gradient(105deg, #c49b20 0%, ${GOLD_LT} 50%, #b8882a 100%)`,
@@ -915,11 +1058,35 @@ export default function App() {
   const [activeDiscover, setActiveDiscover] = useState<
     number | null
   >(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const width = useWindowWidth();
   const isSmall = width < 480;
   const isMobile = width < 768;
   const isTablet = width >= 768 && width < 1024;
   const isDesktop = width >= 1024;
+  const openFormModal = useCallback(() => setIsFormOpen(true), []);
+  const closeFormModal = useCallback(() => setIsFormOpen(false), []);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const existingScript = document.querySelector(
+      `script[src="${FORM_SCRIPT_SRC}"]`,
+    );
+    if (existingScript) return;
+
+    const script = document.createElement("script");
+    script.src = FORM_SCRIPT_SRC;
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.body.style.overflow = isFormOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isFormOpen]);
 
   return (
     <div
@@ -998,6 +1165,8 @@ export default function App() {
           >
             {isMobile ? (
               <button
+                type="button"
+                onClick={openFormModal}
                 style={{
                   fontFamily: FONT_DISPLAY,
                   background: `linear-gradient(105deg, #c49b20 0%, ${GOLD_LT} 50%, #b8882a 100%)`,
@@ -1015,7 +1184,11 @@ export default function App() {
                 RESERVE
               </button>
             ) : (
-              <CTABtn label="RESERVE SEAT" small />
+              <CTABtn
+                label="RESERVE SEAT"
+                small
+                onClick={openFormModal}
+              />
             )}
           </div>
         </nav>
@@ -1179,7 +1352,7 @@ export default function App() {
               alignItems: "center",
             }}
           >
-            <CTABtn full={isMobile} />
+            <CTABtn full={isMobile} onClick={openFormModal} />
             <SecureNote />
           </div>
         </div>
@@ -1962,7 +2135,7 @@ export default function App() {
           alignItems: "center",
         }}
       >
-        <CTABtn full={isMobile} />
+        <CTABtn full={isMobile} onClick={openFormModal} />
         <SecureNote dark />
       </div>
 
@@ -2140,7 +2313,7 @@ export default function App() {
               alignItems: "center",
             }}
           >
-            <CTABtn full={isMobile} />
+            <CTABtn full={isMobile} onClick={openFormModal} />
             <SecureNote dark />
           </div>
         </div>
@@ -2552,7 +2725,7 @@ export default function App() {
                 alignItems: "center",
               }}
             >
-              <CTABtn full={isMobile} />
+              <CTABtn full={isMobile} onClick={openFormModal} />
               <SecureNote />
             </div>
             <div
@@ -2579,6 +2752,166 @@ export default function App() {
           </div>
         </div>
       </section>
+
+      {isFormOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="May 7 Webinar Registration"
+          onClick={closeFormModal}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 9999,
+            background:
+              "radial-gradient(circle at 20% 20%, rgba(124,58,237,0.18) 0%, rgba(0,0,0,0.82) 40%), rgba(0,0,0,0.86)",
+            backdropFilter: "blur(4px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: isMobile ? "12px" : "24px",
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: "100%",
+              maxWidth: "940px",
+              background:
+                "linear-gradient(145deg, rgba(124,58,237,0.22), rgba(212,175,55,0.2))",
+              borderRadius: "14px",
+              padding: isMobile ? "1px" : "2px",
+              overflow: "hidden",
+              boxShadow:
+                "0 26px 90px rgba(0,0,0,0.5), 0 0 40px rgba(124,58,237,0.22)",
+            }}
+          >
+            <div
+              style={{
+                background: CARD,
+                borderRadius: "12px",
+                overflow: "hidden",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: isMobile ? "14px 12px" : "16px 18px",
+                  borderBottom: `1px solid ${BORDER}`,
+                  background:
+                    "linear-gradient(90deg, rgba(124,58,237,0.25), rgba(15,15,26,0.92) 38%, rgba(212,175,55,0.16) 100%)",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "9px",
+                      height: "9px",
+                      borderRadius: "50%",
+                      background: GOLD_LT,
+                      boxShadow: `0 0 12px ${GOLD}`,
+                    }}
+                  />
+                  <div>
+                    <div
+                      style={{
+                        fontFamily: FONT_DISPLAY,
+                        letterSpacing: "0.14em",
+                        color: WHITE,
+                        fontSize: isMobile ? "0.9rem" : "1rem",
+                        lineHeight: 1,
+                      }}
+                    >
+                      FORM FOR MAY 7
+                    </div>
+                    <div
+                      style={{
+                        fontFamily: FONT_BODY,
+                        color: SUB,
+                        fontSize: "0.72rem",
+                        letterSpacing: "0.08em",
+                        marginTop: "4px",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      Free Virtual Webinar Registration
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={closeFormModal}
+                  style={{
+                    width: "34px",
+                    height: "34px",
+                    borderRadius: "50%",
+                    border: `1px solid rgba(255,255,255,0.25)`,
+                    background: "rgba(255,255,255,0.08)",
+                    color: WHITE,
+                    cursor: "pointer",
+                    fontSize: "1.25rem",
+                    lineHeight: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                  aria-label="Close registration form"
+                >
+                  ×
+                </button>
+              </div>
+              <div
+                style={{
+                  padding: isMobile ? "10px 10px 12px" : "12px 12px 14px",
+                  background: `linear-gradient(180deg, ${CARD} 0%, #0b0b13 100%)`,
+                }}
+              >
+                <FormCountdown isMobile={isMobile} />
+                <div
+                  style={{
+                    borderRadius: "10px",
+                    overflow: "hidden",
+                    border: `1px solid ${BORDER}`,
+                    background: WHITE,
+                  }}
+                >
+                  <iframe
+                    src="https://l.industryrockstars.ch/widget/form/Eeoriek3yVE9e0ikuPd3"
+                    style={{
+                      width: "100%",
+                      height: isMobile ? "75vh" : "78vh",
+                      minHeight: "489px",
+                      border: "none",
+                      borderRadius: "3px",
+                    }}
+                    id="inline-Eeoriek3yVE9e0ikuPd3"
+                    data-layout="{'id':'INLINE'}"
+                    data-trigger-type="alwaysShow"
+                    data-trigger-value=""
+                    data-activation-type="alwaysActivated"
+                    data-activation-value=""
+                    data-deactivation-type="neverDeactivate"
+                    data-deactivation-value=""
+                    data-form-name="FB - AI Consultant Certification Webinar - May 7, 2026"
+                    data-height="489"
+                    data-layout-iframe-id="inline-Eeoriek3yVE9e0ikuPd3"
+                    data-form-id="Eeoriek3yVE9e0ikuPd3"
+                    title="FB - AI Consultant Certification Webinar - May 7, 2026"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ══ FOOTER ══ */}
       <footer
