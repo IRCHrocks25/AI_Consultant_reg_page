@@ -1306,7 +1306,7 @@ export default function App() {
             }}
           >
             <video
-              src="https://res.cloudinary.com/dcuswyfur/video/upload/v1777479369/AI_Consultant_t8o1bu.mp4"
+              src="https://cdn.katalyst-crm.com/t1/cloudinary/AI_Consultant_t8o1bu.mp4"
               controls
               playsInline
               style={{
